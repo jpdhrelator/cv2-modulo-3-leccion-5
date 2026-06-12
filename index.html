@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="es" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎯 Bootstrap Battle · Misión Doble</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --bg-deep:   #0d1117;
+      --bg-card:   #161b22;
+      --bg-border: #30363d;
+      --accent-m1: #0d6efd;
+      --accent-m2: #198754;
+      --xp-gold:   #ffd700;
+    }
+    body { background: var(--bg-deep); }
+    #sticky-xp { position:sticky;top:0;z-index:1030;background:var(--bg-card);border-bottom:1px solid var(--bg-border); }
+    .xp-track { background:#21262d;border-radius:50px;height:10px;overflow:hidden; }
+    .xp-fill  { background:linear-gradient(90deg,var(--xp-gold),#ff9d00);height:100%;border-radius:50px;transition:width .6s ease; }
+    .hero-bg  { background:linear-gradient(135deg,#1a1a2e 0%,#16213e 55%,#0f3460 100%);border-bottom:3px solid #e94560; }
+    .pick-card { background:var(--bg-card);border:2px solid var(--bg-border);border-radius:16px;transition:transform .25s,border-color .25s,box-shadow .25s;cursor:pointer; }
+    .pick-card:hover { transform:translateY(-6px); }
+    .pick-card.m1:hover { border-color:var(--accent-m1);box-shadow:0 10px 30px rgba(13,110,253,.35); }
+    .pick-card.m2:hover { border-color:var(--accent-m2);box-shadow:0 10px 30px rgba(25,135,84,.35); }
+    .mission-section { border-top:4px solid var(--accent-m1);background:var(--bg-deep); }
+    .mission-section.m2 { border-top-color:var(--accent-m2); }
+    .task-card { background:var(--bg-card);border:1px solid var(--bg-border);border-radius:12px;transition:border-color .2s; }
+    .task-card.done { border-color:#238636;background:#0d2818; }
+    .task-header { border-left:4px solid var(--accent-m1);padding-left:.9rem; }
+    .m2 .task-header { border-left-color:var(--accent-m2); }
+    .xp-pill { background:linear-gradient(135deg,var(--xp-gold),#ff9d00);color:#000;font-weight:700;font-size:.72rem;padding:3px 10px;border-radius:20px;white-space:nowrap; }
+    .ctag { background:#0d6efd18;border:1px solid #0d6efd44;color:#6ea8fe;padding:2px 7px;border-radius:5px;font-family:monospace;font-size:.82rem; }
+    .m2 .ctag { background:#19875418;border-color:#19875444;color:#75b798; }
+    .instr-box { background:#0d1117;border:1px solid var(--bg-border);border-radius:8px;padding:1rem 1.25rem; }
+    .instr-box ol li { margin-bottom:.55rem;line-height:1.65; }
+    .chk-item { padding:.5rem .75rem;border-radius:6px;transition:background .2s; }
+    .chk-item:hover { background:#21262d; }
+    .chk-item input:checked+label { text-decoration:line-through;opacity:.5; }
+    .rank-row { padding:.45rem .8rem;border-radius:8px; }
+    .rank-row.active-rank { background:#21262d;border:1px solid var(--xp-gold); }
+    .gh-steps { counter-reset:gh; }
+    .gh-step { counter-increment:gh;padding-left:3.2rem;position:relative;margin-bottom:1.6rem; }
+    .gh-step::before { content:counter(gh);position:absolute;left:0;top:2px;width:2rem;height:2rem;border-radius:50%;background:#238636;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem; }
+    .gh-cmd { background:#161b22;border:1px solid #30363d;border-radius:6px;padding:.45rem .9rem;font-family:monospace;font-size:.85rem;color:#e6edf3;display:block;margin-top:.4rem; }
+    #rankUpModal .modal-content { background:var(--bg-card);border:2px solid var(--xp-gold); }
+    @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+    #rankEmoji { animation:pulse 2.4s infinite;display:inline-block; }
+    @keyframes pop { 0%{transform:scale(.5);opacity:0} 70%{transform:scale(1.12)} 100%{transform:scale(1);opacity:1} }
+    .mission-complete-banner { animation:pop .5s ease forwards;background:linear-gradient(90deg,#0f2e0f,#238636,#0f2e0f);border:1px solid #238636;border-radius:12px;padding:1rem;text-align:center; }
+  </style>
+</head>
+<body>
+
+<!-- BARRA XP STICKY -->
+<div id="sticky-xp" class="py-2">
+  <div class="container">
+    <div class="d-flex align-items-center gap-3">
+      <span id="rankEmoji" class="fs-3" style="width:2rem;text-align:center">🥚</span>
+      <div class="flex-grow-1">
+        <div class="d-flex justify-content-between mb-1">
+          <small class="fw-bold" style="color:var(--xp-gold)" id="rankName">Egg Dev</small>
+          <small class="text-muted"><span id="currentXP">0</span> / 300 XP &nbsp;·&nbsp; <span id="tasksCount">0</span> / 20 tareas</small>
+        </div>
+        <div class="xp-track"><div class="xp-fill" id="xpFill" style="width:0%"></div></div>
+      </div>
+      <button class="btn btn-outline-secondary btn-sm" onclick="resetProgress()" title="Reiniciar progreso">
+        <i class="bi bi-arrow-counterclockwise"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero-bg py-5">
+  <div class="container text-center">
+    <span class="badge bg-danger px-3 py-2 mb-3 fs-6">⚡ EJERCICIO FINAL — LECCIÓN 5</span>
+    <h1 class="display-3 fw-bold text-white mb-3">Bootstrap<br><span style="color:var(--xp-gold)">Battle ⚔️</span></h1>
+    <p class="lead text-light mb-2" style="max-width:650px;margin:0 auto">
+      La agencia <strong>DevForce™</strong> tiene <strong>dos clientes en llamas</strong>.
+      Te han contratado a ti. Completa ambas misiones, publica en GitHub Pages y
+      demuestra que mereces el rango <span style="color:var(--xp-gold)">🏆 CTO</span>.
+    </p>
+    <p class="text-muted mb-4 small" style="max-width:650px;margin:0 auto">
+      Crea <code>mision1.html</code> y <code>mision2.html</code> desde cero.
+      Las instrucciones te dicen <em>qué</em> construir y qué componentes usar — el código lo escribes tú.
+    </p>
+    <div class="d-flex justify-content-center gap-3 flex-wrap">
+      <a href="#elegir" class="btn btn-warning btn-lg fw-bold"><i class="bi bi-rocket-takeoff me-2"></i>Elegir misión</a>
+      <a href="#github" class="btn btn-outline-light btn-lg"><i class="bi bi-github me-2"></i>Guía GitHub Pages</a>
+    </div>
+  </div>
+</section>
+
+<!-- PANEL XP Y RANGOS -->
+<section class="py-4" style="background:var(--bg-card);border-bottom:1px solid var(--bg-border)">
+  <div class="container">
+    <div class="row g-3 text-center mb-4">
+      <div class="col-6 col-md-3"><div class="p-3 rounded" style="background:var(--bg-deep);border:1px solid var(--bg-border)"><div class="fs-2">🎮</div><div class="small text-muted">Misión 1</div><div class="fw-bold text-info">125 XP</div></div></div>
+      <div class="col-6 col-md-3"><div class="p-3 rounded" style="background:var(--bg-deep);border:1px solid var(--bg-border)"><div class="fs-2">🌮</div><div class="small text-muted">Misión 2</div><div class="fw-bold text-info">125 XP</div></div></div>
+      <div class="col-6 col-md-3"><div class="p-3 rounded" style="background:var(--bg-deep);border:1px solid var(--bg-border)"><div class="fs-2">⭐</div><div class="small text-muted">Bonus</div><div class="fw-bold" style="color:var(--xp-gold)">50 XP</div></div></div>
+      <div class="col-6 col-md-3"><div class="p-3 rounded" style="background:var(--bg-deep);border:1px solid var(--bg-border)"><div class="fs-2">👑</div><div class="small text-muted">Total posible</div><div class="fw-bold" style="color:var(--xp-gold)">300 XP</div></div></div>
+    </div>
+    <h6 class="text-center text-muted mb-3">TABLA DE RANGOS</h6>
+    <div class="row g-2 justify-content-center" id="rankTable"></div>
+  </div>
+</section>
+
+<!-- ELEGIR MISIÓN -->
+<section id="elegir" class="py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="fw-bold fs-1">¿Por cuál empiezas? 🤔</h2>
+      <p class="text-muted">Debes completar <strong>ambas</strong>. Tú decides el orden.</p>
+    </div>
+    <div class="row g-4 justify-content-center">
+      <div class="col-md-5">
+        <div class="pick-card m1 p-4" onclick="scrollToId('mision1')">
+          <div class="text-center mb-3">
+            <div class="fs-1 mb-2">🎮</div>
+            <h3 class="fw-bold mb-1">Misión 1</h3>
+            <h4 class="text-info mb-3">Startup de Videojuegos</h4>
+            <p class="text-muted">El estudio indie <strong>PixelForge Games</strong> necesita su landing page antes del lanzamiento. El CEO te escribió a las 2 AM.</p>
+          </div>
+          <div class="text-center mb-3">
+            <span class="badge bg-primary me-1 mb-1">Navbar</span><span class="badge bg-primary me-1 mb-1">Alert</span><span class="badge bg-primary me-1 mb-1">Carousel</span><span class="badge bg-primary me-1 mb-1">Cards</span><span class="badge bg-primary me-1 mb-1">Tabla</span><span class="badge bg-primary me-1 mb-1">Form</span><span class="badge bg-primary me-1 mb-1">Modal</span><span class="badge bg-primary me-1 mb-1">Tooltips</span>
+          </div>
+          <div class="text-center">
+            <span class="fw-bold" style="color:var(--xp-gold)">125 XP disponibles</span><br>
+            <span class="text-info small mt-1 d-block"><i class="bi bi-arrow-down-circle me-1"></i>Empezar por aquí</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-5">
+        <div class="pick-card m2 p-4" onclick="scrollToId('mision2')">
+          <div class="text-center mb-3">
+            <div class="fs-1 mb-2">🌮</div>
+            <h3 class="fw-bold mb-1">Misión 2</h3>
+            <h4 class="text-success mb-3">Restaurante Urgente</h4>
+            <p class="text-muted">El restaurante <strong>La Cantina del Dev</strong> tiene mesas llenas pero cero presencia web. El dueño llegó a clases a pedirte ayuda.</p>
+          </div>
+          <div class="text-center mb-3">
+            <span class="badge bg-success me-1 mb-1">Navbar</span><span class="badge bg-success me-1 mb-1">Alert</span><span class="badge bg-success me-1 mb-1">Breadcrumb</span><span class="badge bg-success me-1 mb-1">Carousel</span><span class="badge bg-success me-1 mb-1">Cards</span><span class="badge bg-success me-1 mb-1">Tabla</span><span class="badge bg-success me-1 mb-1">Form</span><span class="badge bg-success me-1 mb-1">Modal</span>
+          </div>
+          <div class="text-center">
+            <span class="fw-bold" style="color:var(--xp-gold)">125 XP disponibles</span><br>
+            <span class="text-success small mt-1 d-block"><i class="bi bi-arrow-down-circle me-1"></i>Empezar por aquí</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MISIÓN 1 -->
+<section id="mision1" class="mission-section py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="badge bg-primary px-3 py-2 fs-6 mb-3">MISIÓN 1 · 125 XP</span>
+      <h2 class="fw-bold display-6">🎮 PixelForge Games</h2>
+      <p class="text-muted" style="max-width:600px;margin:0 auto">Archivo a crear: <code>mision1.html</code> — incluye Bootstrap 5 vía CDN y construye la landing sección por sección.</p>
+      <div class="mt-3" id="m1-complete-banner" style="display:none">
+        <div class="mission-complete-banner d-inline-block px-5"><span class="fs-3">🎉</span><strong class="text-success ms-2">¡Misión 1 completada! +125 XP</strong></div>
+      </div>
+    </div>
+    <div class="row g-4">
+
+      <!-- M1-1 -->
+      <div class="col-12">
+        <div class="task-card p-4" id="card-m1-1">
+          <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+            <div class="task-header"><h4 class="mb-0">Tarea 1 · La barra de navegación</h4><small class="text-muted">El estudio necesita una barra profesional que funcione en celular</small></div>
+            <span class="xp-pill">+20 XP</span>
+          </div>
+          <div class="instr-box mb-3">
+            <ol class="mb-0">
+              <li>Crea el archivo <code>mision1.html</code> con la estructura HTML base. Vincula Bootstrap 5 desde CDN en el <code>&lt;head&gt;</code> y el bundle JS al final del <code>&lt;body&gt;</code>.</li>
+              <li>Construye una barra de navegación usando el componente <span class="ctag">navbar</span>. El nombre de tu startup ficticia va como <span class="ctag">navbar-brand</span>.</li>
+              <li>La barra debe ser <strong>responsive</strong>: en pantallas grandes se muestra completa; en pantallas pequeñas, colapsa. Investiga <span class="ctag">navbar-expand-lg</span> y <span class="ctag">navbar-toggler</span>. ¿Qué atributos conectan el botón hamburguesa con el menú colapsable?</li>
+              <li>Agrega al menos 4 links (<span class="ctag">nav-item</span> + <span class="ctag">nav-link</span>). Uno con clase <span class="ctag">active</span> y otro con <span class="ctag">disabled</span>.</li>
+              <li>Uno de los links debe ser un <strong>dropdown</strong> con al menos 3 sub-opciones. Investiga <span class="ctag">dropdown-toggle</span>, <span class="ctag">dropdown-menu</span> y <span class="ctag">dropdown-item</span>.</li>
+              <li>Elige el esquema de colores. Recuerda que el color del texto y el del fondo son clases independientes.</li>
+            </ol>
+          </div>
+          <div class="chk-item"><div class="form-check"><input class="form-check-input" type="checkbox" id="chk-m1-1" data-xp="20" data-card="card-m1-1" data-mission="1"><label class="form-check-label fw-semibold" for="chk-m1-1">✅ Navbar responsive con brand, 4 links, dropdown y hamburguesa</label></div></div>
+        </div>
+      </div>
+
+      <!-- M1-2 -->
+      <div class="col-12 col-lg-6">
+        <div class="task-card p-4 h-100" id="card-m1-2">
+          <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+            <div class="task-header"><h4 class="mb-0">Tarea 2 · Anuncio de lanzamiento</h4><small class="text-muted">"El juego se lanza en 30 días. ¡El mundo debe saberlo!"</small></div>
+            <span class="xp-pill">+10 XP</span>
+          </div>
+          <div class="instr-box mb-3">
+            <ol class="mb-0">
+              <li>Agrega debajo de la navbar un <span class="ctag">alert</span> con la fecha de lanzamiento del juego.</li>
+              <li>Usa una variante de color que transmita urgencia o emoción. Prueba <span class="ctag">alert-warning</span>, <span class="ctag">alert-danger</span>, <span class="ctag">alert-info</span> y elige.</li>
+              <li>El alert debe ser <strong>descartable</strong>: el usuario puede cerrarlo. Investiga <span class="ctag">data-bs-dismiss="alert"</span> y <span class="ctag">btn-close</span>. ¿Qué clase extra necesita el <code>div</code> del alert para que el botón funcione?</li>
+            </ol>
+          </div>
+          <div class="chk-item"><div class="form-check"><input class="form-check-input" type="checkbox" id="chk-m1-2" data-xp="10" data-card="card-m1-2" data-mission="1"><label class="form-check-label fw-semibold" for="chk-m1-2">✅ Alert descartable con fecha de lanzamiento</label></div></div>
+        </div>
+      </div>
+
+      <!-- M1-3 -->
+      <div class="col-12 col-lg-6">
+        <div class="task-card p-4 h-100" id="card-m1-3">
+          <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+            <div class="task-header"><h4 class="mb-0">Tarea 3 · Galería de screenshots</h4><small class="text-muted">"Los fans quieren ver el juego antes de comprarlo"</small></div>
+            <span class="xp-pill">+15 XP</span>
+          </div>
+          <div class="instr-box mb-3">
+            <ol class="mb-0">
+              <li>Crea un <span class="ctag">carousel</span> con al menos 3 slides. Como no tienes imágenes reales, usa bloques SVG inline con colores distintos y emojis, igual que en los ejemplos de clase.</li>
+              <li>Debe incluir: <strong>indicadores</strong> (puntitos de progreso), <strong>controles</strong> anterior/siguiente, y al menos un <strong>caption</strong> con el nombre de la escena del juego.</li>
+              <li>El carrusel debe reproducirse automáticamente. Investiga el atributo <span class="ctag">data-bs-ride="carousel"</span>.</li>
+            </ol>
+          </div>
+          <div class="chk-item"><div class="form-check"><input class="form-check-input" type="checkbox" id="chk-m1-3" data-xp="15" data-card="card-m1-3" data-mission="1"><label class="form-check-label fw-semibold" for="chk-m1-3">✅ Carousel con 3+ slides, indicadores, controles y caption</label></div></div>
+        </div>
+      </div>
+
+      <!-- M1-4 -->
+      <div class="col-12">
+        <div class="task-card p-4" id="card-m1-4">
+          <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+            <div class="task-header"><h4 class="mb-0">Tarea 4 · Características del juego</h4><small class="text-muted">"¿Por qué este juego es único? ¡Muéstralo en cards!"</small></div>
+            <span class="xp-pill">+15 XP</span>
+          </div>
+          <div class="instr-box mb-3">
+            <ol class="mb-0">
+              <li>Crea al menos <strong>3 cards</strong> con características del juego (ej: Multijugador, 50 niveles, Banda sonora épica).</li>
+              <li>Usa <span class="ctag">row</span> + <span class="ctag">col-</span> para grilla responsive: 1 por fila en móvil, 2 en tablet, 3 en desktop.</li>
+              <li>Cada card debe tener <span class="ctag">card-header</span>, <span class="ctag">card-body</span> con título y descripción, y un botón en el <span class="ctag">card-footer</span>.</li>
+              <li>Usa <span class="ctag">h-100</span> en las cards. ¿Qué clase del <code>col-</code> padre también es necesaria para igualar alturas?</li>
+              <li>Personaliza el borde de al menos una card con las utilidades <span class="ctag">border-*</span>.</li>
+            </ol>
+          </div>
+          <div class="chk-item"><div class="form-check"><input class="form-check-input" type="checkbox" id="chk-m1-4" data-xp="15" data-card="card-m1-4" data-mission="1"><label class="form-check-label fw-semibold" for="chk-m1-4">✅ 3+ cards responsivas en grilla con header, body y footer</label></div></div>
+        </div>
+      </div>
+
+      <!-- M1-5 -->
+      <div class="col-12 col-lg-6">
+        <div class="task-card p-4 h-100" id="card-m1-5">
+          <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+            <div class="task-header"><h4 class="mb-0">Tarea 5 · Leaderboard global</h4><small class="text-muted">"Los 5 mejores jugadores del mundo. Todos quieren verlo."</small></div>
+            <span class="xp-pill">+15 XP</span>
+          </div>
+          <div class="instr-box mb-3">
+            <ol class="mb-0">
+              <li>Crea una tabla con los <strong>5 mejores jugadores ficticios</strong>. Columnas: Posición 🏅, Nombre, Puntuación y País.</li>
+              <li>Aplica al menos <strong>3</strong> de estos modificadores: <span class="ctag">table-striped</span>, <span class="ctag">table-hover</span>, <span class="ctag">table-bordered</span>, <span class="ctag">table-dark</span>.</li>
+              <li>Agrega un <span class="ctag">caption</span> visible a la tabla.</li>
+              <li>Envuelve la tabla en <span class="ctag">table-responsive</span> para que no rompa en móvil.</li>
+            </ol>
+          </div>
+          <div class="chk-item"><div class="form-check"><input class="form-check-input" type="checkbox" id="chk-m1-5" data-xp="15" data-card="card-m1-5" data-mission="1"><label class="form-check-label fw-semibold" for="chk-m1-5">✅ Tabla responsive con 3+ modificadores y caption</label></div></div>
+        </div>
+      </div>
+
+      <!-- M1-6 -->
+      <div class="col-12 col-lg-6">
+        <div class="task-card p-4 h-100" id="card-m1-6">
+          <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+            <div class="task-header"><h4 class="mb-0">Tarea 6 · Formulario de pre-registro</h4><small class="text-muted">"El juego no salió, pero la gente ya puede anotarse a la beta"</small></div>
+            <span class="xp-pill">+20 XP</span>
+          </div>
+          <div class="instr-box mb-3">
+            <ol class="mb-0">
+              <li>Crea un formulario dentro de una <span class="ctag">card</span> con <span class="ctag">shadow</span>.</li>
+              <li>Incluye: <span class="ctag">form-control</span> para nombre y email, un <span class="ctag">form-select</span> para plataforma (PC / PS5 / Xbox / Mobile), y un <span class="ctag">form-check</span> para aceptar los términos.</li>
+              <li>Usa la <strong>grilla dentro del formulario</strong>: Nombre y Email lado a lado en desktop (revisa el ejemplo "Adopta un Gatito" de clase).</li>
+              <li>Activa la <strong>validación visual</strong>: <span class="ctag">novalidate</span> en el <code>&lt;form&gt;</code>, campos <span class="ctag">required</span> y mensajes <span class="ctag">invalid-feedback</span>. Investiga cómo activar <span class="ctag">was-validated</span> con JavaScript al intentar enviar.</li>
+            </ol>
+          </div>
+          <div class="chk-item"><div class="form-check"><input class="form-check-input" type="checkbox" id="chk-m1-6" data-xp="20" data-card="card-m1-6" data-mission="1"><label class="form-check-label fw-semibold" for="chk-m1-6">✅ Formulario con grilla interna, select, checkbox y validación visual</label></div></div>
+        </div>
+      </div>
+
+      <!-- M1-7 -->
+      <div class="col-12 col-lg-6">
+        <div class="task-card p-4 h-100" id="card-m1-7">
+          <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+            <div class="task-header"><h4 class="mb-0">Tarea 7 · Modal del tráiler</h4><small class="text-muted">"Un botón épico que revela el tráiler del juego"</small></div>
+            <span class="xp-pill">+20 XP</span>
+          </div>
+          <div class="instr-box mb-3">
+            <ol class="mb-0">
+              <li>Agrega un botón grande con el texto "▶ Ver Tráiler Oficial". Debe abrir un <span class="ctag">modal</span> al hacer clic.</li>
+              <li>Ábrelo usando <strong>solo atributos HTML</strong>: <span class="ctag">data-bs-toggle="modal"</span> + <span class="ctag">data-bs-target</span>. Sin JavaScript propio.</li>
+              <li>El modal debe tener <span class="ctag">modal-header</span> con título y botón de cierre, <span class="ctag">modal-body</span> con descripción o iframe de YouTube, y <span class="ctag">modal-footer</span> con "Cerrar" y "Pre-registrarme".</li>
+              <li>Usa <span class="ctag">modal-lg</span> o <span class="ctag">modal-xl</span> en el <span class="ctag">modal-dialog</span> para hacerlo más grande.</li>
+            </ol>
+          </div>
+          <div class="chk-item"><div class="form-check"><input class="form-check-input" type="checkbox" id="chk-m1-7" data-xp="20" data-card="card-m1-7" data-mission="1"><label class="form-check-label fw-semibold" for="chk-m1-7">✅ Modal grande abierto con data-attributes, header/body/footer</label></div></div>
+        </div>
+      </div>
+
+      <!-- M1-8 -->
+      <div class="col-12 col-lg-6">
+        <div class="task-card p-4 h-100" id="card-m1-8">
+          <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+            <div class="task-header"><h4 class="mb-0">Tarea 8 · Stats con tooltips</h4><small class="text-muted">"Algunos números del juego necesitan contexto al hacer hover"</small></div>
+            <span class="xp-pill">+10 XP</span>
+          </div>
+          <div class="instr-box mb-3">
+            <ol class="mb-0">
+              <li>Crea al menos <strong>3 stats del juego</strong> visibles (ej: "4.9 ★", "2M jugadores", "50h de contenido") usando <span class="ctag">badge</span> o <span class="ctag">btn</span>.</li>
+              <li>Cada uno debe mostrar un <span class="ctag">tooltip</span> al pasar el mouse usando los atributos <span class="ctag">data-bs-toggle="tooltip"</span> y <span class="ctag">title</span>.</li>
+              <li><strong>Importante:</strong> los tooltips no se activan solos. Necesitas inicializarlos con JavaScript usando <code>querySelectorAll</code> y un bucle, igual que en el ejemplo de clase. Sin este paso, no aparecerán.</li>
+            </ol>
+          </div>
+          <div class="chk-item"><div class="form-check"><input class="form-check-input" type="checkbox" id="chk-m1-8" data-xp="10" data-card="card-m1-8" data-mission="1"><label class="form-check-label fw-semibold" for="chk-m1-8">✅ 3+ tooltips inicializados con JS y visibles al hacer hover</label></div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- MISIÓN 2 -->
+<section id="mision2" class="mission-section m2 py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="badge bg-success px-3 py-2 fs-6 mb-3">MISIÓN 2 · 125 XP</span>
+      <h2 class="fw-bold display-6">🌮 La Cantina del Dev</h2>
+      <p class="text-muted" style="max-width:600px;margin:0 auto">Archivo a crear: <code>mision2.html</code> — nuevo archivo, mismo proceso. Ponle el nombre de restaurante que quieras.</p>
+      <div class="mt-3" id="m2-complete-banner" style="display:none">
+        <div class="mission-complete-banner d-inline-block px-5"><span class="fs-3">🎉</span><strong class="text-success ms-2">¡Misión 2 completada! +125 XP</strong></div>
+      </div>
+    </div>
+    <div class="row g-4">
+
+      <!-- M2-1 -->
+      <div class="col-12">
+        <div class="task-card m2 p-4" id="card-m2-1">
+          <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+            <div class="task-header"><h4 class="mb-0">Tarea 1 · La barra del restaurante</h4><small class="text-muted">"Distinta a la Misión 1 — cada cliente tiene su identidad"</small></div>
+            <span class="xp-pill">+20 XP</span>
+          </div>
+          <div class="instr-box mb-3">
+            <ol class="mb-0">
+              <li>Crea <code>mision2.html</code> con estructura base y Bootstrap 5 CDN.</li>
+              <li>Construye una navbar con el nombre del restaurante como <span class="ctag">navbar-brand</span>. Elige un esquema de color <strong>diferente al de la Misión 1</strong> (prueba <span class="ctag">bg-warning</span>, <span class="ctag">bg-danger</span>, <span class="ctag">bg-success</span>).</li>
+              <li>Links: Inicio, Menú, Reservas, Nosotros. El dropdown debe contener las categorías del menú (Entradas, Fondos, Postres, Bebidas).</li>
+              <li>Agrega un link que se vea como <strong>botón</strong> dentro de la navbar para "Reservar ahora". ¿Cómo combinas clases de navegación con clases de botón sin romper el layout?</li>
+            </ol>
+          </div>
+          <div class="chk-item"><div class="form-check"><input class="form-check-input" type="checkbox" id="chk-m2-1" data-xp="20" data-card="card-m2-1" data-mission="2"><label class="form-check-label fw-semibold" for="chk-m2-1">✅ Navbar con color diferente a M1, dropdown de menú y botón de reserva</label></div></div>
+        </div>
+      </div>
+
+      <!-- M2-2 -->
+      <div class="col-12 col-lg-6">
+        <div class="task-card m2 p-4 h-100" id="card-m2-2">
+          <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+            <div class="task-header"><h4 class="mb-0">Tarea 2 · Promo del día y migas de pan</h4><small class="text-muted">"2×1 en tacos y breadcrumb para no perderse"</small></div>
+            <span class="xp-pill">+10 XP</span>
+          </div>
+          <div class="instr-box mb-3">
+            <ol class="mb-0">
+              <li>Agrega un <span class="ctag">alert</span> descartable con la promoción del día (ej: "🎉 Hoy 2×1 en todos los fondos hasta las 15:00").</li>
+              <li>Debajo del alert, agrega un <span class="ctag">breadcrumb</span> que simule la navegación: <em>Inicio → Menú → Fondos</em>. El último ítem debe tener la clase <span class="ctag">active</span> y el atributo <span class="ctag">aria-current="page"</span>. ¿Para qué sirve ese atributo?</li>
+            </ol>
+          </div>
+          <div class="chk-item"><div class="form-check"><input class="form-check-input" type="checkbox" id="chk-m2-2" data-xp="10" data-card="card-m2-2" data-mission="2"><label class="form-check-label fw-semibold" for="chk-m2-2">✅ Alert descartable de promo + breadcrumb de 3 niveles</label></div></div>
+        </div>
+      </div>
+
+      <!-- M2-3 -->
+      <div class="col-12 col-lg-6">
+        <div class="task-card m2 p-4 h-100" id="card-m2-3">
+          <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+            <div class="task-header"><h4 class="mb-0">Tarea 3 · Galería del restaurante</h4><small class="text-muted">"Las fotos de comida venden más que cualquier texto"</small></div>
+            <span class="xp-pill">+15 XP</span>
+          </div>
+          <div class="instr-box mb-3">
+            <ol class="mb-0">
+              <li>Crea un <span class="ctag">carousel</span> con al menos 3 slides de platos o del local (SVG inline con colores cálidos y emojis de comida).</li>
+              <li>A diferencia de la Misión 1, este carrusel <strong>no debe reproducirse automáticamente</strong>. ¿Qué atributo hay que omitir?</li>
+              <li>Agrega un caption en cada slide con el nombre del plato o del espacio.</li>
+            </ol>
+          </div>
+          <div class="chk-item"><div class="form-check"><input class="form-check-input" type="checkbox" id="chk-m2-3" data-xp="15" data-card="card-m2-3" data-mission="2"><label class="form-check-label fw-semibold" for="chk-m2-3">✅ Carousel manual (sin autoplay) con captions en cada slide</label></div></div>
+        </div>
+      </div>
+
+      <!-- M2-4 -->
+      <div class="col-12">
+        <div class="task-card m2 p-4" id="card-m2-4">
+          <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+            <div class="task-header"><h4 class="mb-0">Tarea 4 · Platos destacados</h4><small class="text-muted">"Los tres platos favoritos de la casa, en vitrina"</small></div>
+            <span class="xp-pill">+15 XP</span>
+          </div>
+          <div class="instr-box mb-3">
+            <ol class="mb-0">
+              <li>Crea <strong>3 cards</strong> para los platos estrella, distribuidas en grilla responsive (1 en móvil, 3 en desktop).</li>
+              <li>Cada card: "imagen" hecha con SVG inline (<span class="ctag">card-img-top</span>) con fondo de color y emoji del plato, <span class="ctag">card-body</span> con nombre y descripción, y un <span class="ctag">badge</span> con el precio.</li>
+              <li>Todas con igual altura usando <span class="ctag">h-100</span>. ¿Qué clase del <code>col-</code> padre también es necesaria?</li>
+            </ol>
+          </div>
+          <div class="chk-item"><div class="form-check"><input class="form-check-input" type="checkbox" id="chk-m2-4" data-xp="15" data-card="card-m2-4" data-mission="2"><label class="form-check-label fw-semibold" for="chk-m2-4">✅ 3 cards de platos con imagen SVG, badge de precio y h-100</label></div></div>
+        </div>
+      </div>
+
+      <!-- M2-5 -->
+      <div class="col-12 col-lg-6">
+        <div class="task-card m2 p-4 h-100" id="card-m2-5">
+          <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+            <div class="task-header"><h4 class="mb-0">Tarea 5 · Carta de precios</h4><small class="text-muted">"Todo el menú con sus precios, bien ordenado"</small></div>
+            <span class="xp-pill">+15 XP</span>
+          </div>
+          <div class="instr-box mb-3">
+            <ol class="mb-0">
+              <li>Crea una tabla del menú con columnas: Plato, Descripción y Precio. Al menos 6 filas con <code>&lt;thead&gt;</code> y <code>&lt;tbody&gt;</code>.</li>
+              <li>Usa <span class="ctag">table-striped</span> y <span class="ctag">table-hover</span>. Pinta de un color diferente la fila del plato más caro usando las <strong>clases contextuales de fila</strong> (ej: <span class="ctag">table-warning</span>).</li>
+              <li>Agrega un <span class="ctag">caption</span> con "Precios incluyen IVA" y envuelve la tabla en <span class="ctag">table-responsive</span>.</li>
+            </ol>
+          </div>
+          <div class="chk-item"><div class="form-check"><input class="form-check-input" type="checkbox" id="chk-m2-5" data-xp="15" data-card="card-m2-5" data-mission="2"><label class="form-check-label fw-semibold" for="chk-m2-5">✅ Tabla con fila destacada, caption y table-responsive</label></div></div>
+        </div>
+      </div>
+
+      <!-- M2-6 -->
+      <div class="col-12 col-lg-6">
+        <div class="task-card m2 p-4 h-100" id="card-m2-6">
+          <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+            <div class="task-header"><h4 class="mb-0">Tarea 6 · Formulario de reserva</h4><small class="text-muted">"Sin reservas digitales, todo depende del teléfono"</small></div>
+            <span class="xp-pill">+20 XP</span>
+          </div>
+          <div class="instr-box mb-3">
+            <ol class="mb-0">
+              <li>Formulario con: nombre, email, <code>input type="date"</code>, <code>input type="time"</code>, <span class="ctag">form-select</span> para número de personas (1–10+), y <span class="ctag">textarea</span> para peticiones especiales.</li>
+              <li>Organiza con grilla: Nombre + Email en la misma fila, Fecha + Hora en otra fila, desde <code>md</code>.</li>
+              <li>Activa validación visual con <span class="ctag">novalidate</span>, <span class="ctag">required</span> e <span class="ctag">invalid-feedback</span>.</li>
+              <li>El botón de envío debe abrir el modal de confirmación de la siguiente tarea. Piensa cómo conectarlos.</li>
+            </ol>
+          </div>
+          <div class="chk-item"><div class="form-check"><input class="form-check-input" type="checkbox" id="chk-m2-6" data-xp="20" data-card="card-m2-6" data-mission="2"><label class="form-check-label fw-semibold" for="chk-m2-6">✅ Formulario con date, time, select, textarea, grilla y validación</label></div></div>
+        </div>
+      </div>
+
+      <!-- M2-7 -->
+      <div class="col-12">
+        <div class="task-card m2 p-4" id="card-m2-7">
+          <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+            <div class="task-header"><h4 class="mb-0">Tarea 7 · Modal de confirmación de reserva</h4><small class="text-muted">"¡Su mesa está confirmada, señor Dev!"</small></div>
+            <span class="xp-pill">+20 XP</span>
+          </div>
+          <div class="instr-box mb-3">
+            <ol class="mb-0">
+              <li>Crea un <span class="ctag">modal</span> de confirmación que aparezca al enviar el formulario. Puedes abrirlo con data-attributes o con la API JS: <code>new bootstrap.Modal(...).show()</code>.</li>
+              <li>El modal debe tener: header con fondo verde y "✅ ¡Reserva confirmada!", body con resumen de la reserva, y footer con botón "Cerrar".</li>
+              <li>Investiga cómo cambiar el color del <span class="ctag">modal-header</span> con las utilidades de fondo de Bootstrap.</li>
+              <li><strong>Desafío extra (sin XP adicional):</strong> muestra en el modal el nombre y fecha que el usuario escribió, leyendo los valores del formulario con JavaScript antes de abrir el modal.</li>
+            </ol>
+          </div>
+          <div class="chk-item"><div class="form-check"><input class="form-check-input" type="checkbox" id="chk-m2-7" data-xp="20" data-card="card-m2-7" data-mission="2"><label class="form-check-label fw-semibold" for="chk-m2-7">✅ Modal de confirmación verde con header, body y footer funcionales</label></div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- BONUS -->
+<section id="bonus" class="py-5" style="background:#1a1100;border-top:3px solid var(--xp-gold)">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="badge px-3 py-2 fs-6 mb-3" style="background:var(--xp-gold);color:#000">⭐ BONUS · 50 XP</span>
+      <h2 class="fw-bold display-6">Desafíos extra</h2>
+      <p class="text-muted">Opcionales — pero necesarios para alcanzar el rango <strong style="color:var(--xp-gold)">👑 LEYENDA</strong></p>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-6">
+        <div class="task-card p-4 h-100" style="border-color:#ffd70044" id="card-b1">
+          <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2"><h5 class="mb-0">🎨 Tema personalizado</h5><span class="xp-pill">+15 XP</span></div>
+          <p class="text-muted small mb-3">Personaliza el look de alguna de las dos misiones redefiniendo variables CSS de Bootstrap en un <code>&lt;style&gt;</code>. Por ejemplo: <span class="ctag">--bs-primary</span>, <span class="ctag">--bs-body-bg</span>, o activa el modo oscuro con <span class="ctag">data-bs-theme="dark"</span> en el <code>&lt;html&gt;</code>. El resultado debe verse notablemente diferente al Bootstrap por defecto.</p>
+          <div class="chk-item"><div class="form-check"><input class="form-check-input" type="checkbox" id="chk-b1" data-xp="15" data-card="card-b1" data-mission="0"><label class="form-check-label fw-semibold" for="chk-b1">✅ Tema personalizado aplicado en al menos una misión</label></div></div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="task-card p-4 h-100" style="border-color:#ffd70044" id="card-b2">
+          <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2"><h5 class="mb-0">💬 Popover informativo</h5><span class="xp-pill">+10 XP</span></div>
+          <p class="text-muted small mb-3">Agrega al menos un <span class="ctag">popover</span> en cualquiera de las dos misiones. A diferencia del tooltip (aparece al hacer hover), el popover se activa al hacer clic y puede tener título y cuerpo independientes. También necesita inicialización con JavaScript.</p>
+          <div class="chk-item"><div class="form-check"><input class="form-check-input" type="checkbox" id="chk-b2" data-xp="10" data-card="card-b2" data-mission="0"><label class="form-check-label fw-semibold" for="chk-b2">✅ Al menos un popover funcional con título y contenido</label></div></div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="task-card p-4 h-100" style="border-color:#ffd70044" id="card-b3">
+          <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2"><h5 class="mb-0">📱 Verificación responsive</h5><span class="xp-pill">+10 XP</span></div>
+          <p class="text-muted small mb-3">Abre ambos archivos en Chrome, presiona <kbd>F12</kbd>, activa el modo responsive y prueba 3 tamaños: <strong>375px</strong> (iPhone SE), <strong>768px</strong> (iPad) y <strong>1280px</strong> (desktop). Verifica que ningún elemento rompe el layout, que los navbars colapsan correctamente y que las grillas cambian como esperabas.</p>
+          <div class="chk-item"><div class="form-check"><input class="form-check-input" type="checkbox" id="chk-b3" data-xp="10" data-card="card-b3" data-mission="0"><label class="form-check-label fw-semibold" for="chk-b3">✅ Ambas misiones verificadas en 3 breakpoints con DevTools</label></div></div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="task-card p-4 h-100" style="border-color:#ffd70044" id="card-b4">
+          <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2"><h5 class="mb-0">📝 README en el repositorio</h5><span class="xp-pill">+15 XP</span></div>
+          <p class="text-muted small mb-3">Crea un archivo <code>README.md</code> en tu repositorio con: tu nombre, una descripción breve de cada misión, los componentes de Bootstrap que usaste (al menos 5), y el link a tu GitHub Pages. Markdown usa <code>#</code> para títulos, <code>**negrita**</code> y <code>- item</code> para listas.</p>
+          <div class="chk-item"><div class="form-check"><input class="form-check-input" type="checkbox" id="chk-b4" data-xp="15" data-card="card-b4" data-mission="0"><label class="form-check-label fw-semibold" for="chk-b4">✅ README.md con descripción, componentes y link publicado</label></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GUÍA GITHUB PAGES -->
+<section id="github" class="py-5" style="border-top:3px solid #238636">
+  <div class="container" style="max-width:800px">
+    <div class="text-center mb-5">
+      <span class="badge bg-success px-3 py-2 fs-6 mb-3">ENTREGA FINAL</span>
+      <h2 class="fw-bold display-6"><i class="bi bi-github me-2"></i>Publicar en GitHub Pages</h2>
+      <p class="text-muted">Tu trabajo no existe si nadie puede verlo. Así se publica gratis.</p>
+    </div>
+    <div class="gh-steps">
+      <div class="gh-step">
+        <h5 class="fw-bold">Crea un repositorio público en GitHub</h5>
+        <p class="text-muted">Ve a <strong>github.com</strong> → botón verde <strong>"New"</strong> → nombre descriptivo (ej: <code>bootstrap-battle</code>) → selecciona <strong>Public</strong> → clic en <strong>"Create repository"</strong>.</p>
+      </div>
+      <div class="gh-step">
+        <h5 class="fw-bold">Sube tus archivos</h5>
+        <p class="text-muted mb-2"><strong>Opción A — interfaz web:</strong> en la página del repo clic en <strong>"uploading an existing file"</strong> → arrastra <code>mision1.html</code>, <code>mision2.html</code> y <code>README.md</code> → clic en <strong>"Commit changes"</strong>.</p>
+        <p class="text-muted mb-1"><strong>Opción B — Git en terminal:</strong></p>
+        <code class="gh-cmd">git init</code>
+        <code class="gh-cmd">git add mision1.html mision2.html README.md</code>
+        <code class="gh-cmd">git commit -m "Bootstrap Battle completado"</code>
+        <code class="gh-cmd">git branch -M main</code>
+        <code class="gh-cmd">git remote add origin https://github.com/TU_USUARIO/TU_REPO.git</code>
+        <code class="gh-cmd">git push -u origin main</code>
+      </div>
+      <div class="gh-step">
+        <h5 class="fw-bold">Activa GitHub Pages</h5>
+        <p class="text-muted">En tu repo ve a <strong>Settings</strong> → sección <strong>Pages</strong> (menú lateral) → en Source elige <strong>"Deploy from a branch"</strong> → Branch: <strong>main</strong>, carpeta: <strong>/ (root)</strong> → clic en <strong>Save</strong>.</p>
+      </div>
+      <div class="gh-step">
+        <h5 class="fw-bold">Espera ~2 min y accede a tu sitio</h5>
+        <p class="text-muted">GitHub mostrará la URL publicada en la misma sección Pages:</p>
+        <code class="gh-cmd">https://TU_USUARIO.github.io/TU_REPO/mision1.html</code>
+        <code class="gh-cmd">https://TU_USUARIO.github.io/TU_REPO/mision2.html</code>
+        <p class="text-muted mt-2 small">⏳ Si no carga de inmediato, espera 1–2 minutos y recarga la página.</p>
+      </div>
+      <div class="gh-step">
+        <h5 class="fw-bold">Entrega el link</h5>
+        <p class="text-muted">Copia la URL de tu GitHub Pages y entrégala en la plataforma del curso. El link debe abrir directamente tu trabajo publicado, no el código fuente.</p>
+        <div class="alert alert-success mt-2 mb-0">
+          <i class="bi bi-check-circle-fill me-2"></i><strong>¡Listo!</strong> Tienes un sitio real publicado en internet. Agrégalo a tu portafolio o LinkedIn 🚀
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="py-4 text-center text-muted" style="background:var(--bg-card);border-top:1px solid var(--bg-border)">
+  <p class="mb-1">Bootstrap Battle · Lección 5 · Módulo 3 · Talento Digital</p>
+  <p class="mb-0 small">Bootstrap 5.3 · <a href="https://getbootstrap.com/docs/5.3" target="_blank" class="text-info">Documentación oficial</a></p>
+</footer>
+
+<!-- TOAST -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index:2000">
+  <div id="xpToast" class="toast border-0" role="alert" style="background:var(--bg-card);border:1px solid var(--xp-gold) !important">
+    <div class="d-flex align-items-center p-3">
+      <span id="toastIcon" class="fs-4 me-2">⚡</span>
+      <div id="toastMsg" class="fw-bold" style="color:var(--xp-gold)">+20 XP</div>
+      <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="toast"></button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL RANK-UP -->
+<div class="modal fade" id="rankUpModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-center">
+      <div class="modal-body py-5">
+        <div id="ruIcon" class="display-1 mb-2">🚀</div>
+        <div class="badge bg-warning text-dark mb-3 px-3 py-2 fs-6">¡ RANK UP !</div>
+        <h3 class="text-white">Ahora eres</h3>
+        <h2 id="ruName" class="fw-bold mb-1" style="color:var(--xp-gold)"></h2>
+        <p id="ruXP" class="text-muted mb-4"></p>
+        <button class="btn btn-warning btn-lg px-5 fw-bold" data-bs-dismiss="modal">¡A seguir! 💪</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const RANKS=[{emoji:'🥚',name:'Egg Dev',min:0,max:20},{emoji:'🐣',name:'Junior Dev',min:21,max:60},{emoji:'💻',name:'Mid Dev',min:61,max:120},{emoji:'🚀',name:'Senior Dev',min:121,max:190},{emoji:'🔥',name:'Tech Lead',min:191,max:250},{emoji:'🏆',name:'CTO',min:251,max:299},{emoji:'👑',name:'LEYENDA',min:300,max:300}];
+const MISSION_TASKS={1:['chk-m1-1','chk-m1-2','chk-m1-3','chk-m1-4','chk-m1-5','chk-m1-6','chk-m1-7','chk-m1-8'],2:['chk-m2-1','chk-m2-2','chk-m2-3','chk-m2-4','chk-m2-5','chk-m2-6','chk-m2-7']};
+const KEY='bsBattle_v1';
+function buildRankTable(){const wrap=document.getElementById('rankTable');RANKS.forEach(r=>{const col=document.createElement('div');col.className='col-6 col-sm-4 col-md-3 col-lg-auto';col.innerHTML=`<div class="rank-row d-flex align-items-center gap-2" id="rrow-${r.name.replace(/ /g,'')}"><span class="fs-4">${r.emoji}</span><div><div class="fw-bold small">${r.name}</div><div class="text-muted" style="font-size:.7rem">${r.min===r.max?r.min:r.min+'–'+r.max} XP</div></div></div>`;wrap.appendChild(col);});}
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||{};}catch{return{};}}
+function save(s){localStorage.setItem(KEY,JSON.stringify(s));}
+function totalXP(s){return Object.values(s).reduce((a,v)=>a+v,0);}
+function getRank(xp){for(let i=RANKS.length-1;i>=0;i--)if(xp>=RANKS[i].min)return RANKS[i];return RANKS[0];}
+function updateUI(){const s=load();const xp=totalXP(s);const rank=getRank(xp);const done=Object.keys(s).length;document.getElementById('currentXP').textContent=xp;document.getElementById('tasksCount').textContent=done;document.getElementById('rankName').textContent=rank.name;document.getElementById('rankEmoji').textContent=rank.emoji;document.getElementById('xpFill').style.width=Math.min((xp/300)*100,100)+'%';document.querySelectorAll('.rank-row').forEach(el=>el.classList.remove('active-rank'));document.getElementById('rrow-'+rank.name.replace(/ /g,''))?.classList.add('active-rank');document.querySelectorAll('input[data-xp]').forEach(chk=>{const checked=s[chk.id]!==undefined;chk.checked=checked;document.getElementById(chk.dataset.card)?.classList.toggle('done',checked);});[1,2].forEach(n=>{const allDone=MISSION_TASKS[n].every(id=>s[id]!==undefined);const banner=document.getElementById('m'+n+'-complete-banner');if(banner)banner.style.display=allDone?'block':'none';});}
+function showToast(icon,msg){document.getElementById('toastIcon').textContent=icon;document.getElementById('toastMsg').textContent=msg;bootstrap.Toast.getOrCreateInstance(document.getElementById('xpToast'),{delay:3000}).show();}
+function showRankUp(rank){document.getElementById('ruIcon').textContent=rank.emoji;document.getElementById('ruName').textContent=rank.name;document.getElementById('ruXP').textContent=rank.min+' XP alcanzados';new bootstrap.Modal(document.getElementById('rankUpModal')).show();}
+function onCheck(chk){const s=load();const xpBefore=totalXP(s);const rankBefore=getRank(xpBefore);if(chk.checked){s[chk.id]=parseInt(chk.dataset.xp);}else{delete s[chk.id];}save(s);updateUI();if(chk.checked){const label=chk.nextElementSibling?.textContent.replace('✅ ','').substring(0,40)||'';showToast('⚡','+'+chk.dataset.xp+' XP · '+label+'…');const rankAfter=getRank(totalXP(s));if(rankAfter.name!==rankBefore.name){setTimeout(()=>showRankUp(rankAfter),700);}}}
+function resetProgress(){if(!confirm('¿Reiniciar todo el progreso? Volverás a 0 XP.'))return;localStorage.removeItem(KEY);updateUI();}
+function scrollToId(id){document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});}
+document.addEventListener('DOMContentLoaded',()=>{buildRankTable();updateUI();document.querySelectorAll('input[data-xp]').forEach(chk=>{chk.addEventListener('change',()=>onCheck(chk));});});
+</script>
+</body>
+</html>
