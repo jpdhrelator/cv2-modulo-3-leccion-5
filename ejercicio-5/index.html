@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Ejercicio 5</title>
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+            rel="stylesheet">
+
+    </head>
+    <body>
+        <div class="container">
+          <h1 class="mb-1">🐱 Centro de Adopción Felina</h1>
+            <form>
+                <h5 class="mb-3">1. Tus datos</h5>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="nombre" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="nombre" placeholder="Michi Lover" required>
+                        <div class="invalid-feedback">Necesitamos tu nombre para los papeles de adopción.</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" placeholder="tu@email.com" required>
+                        <div class="invalid-feedback">El gatito te enviará selfies a este correo. Es obligatorio.</div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="experiencia" class="form-label">Años de experiencia con gatos</label>
+                    <input type="number" class="form-control" id="experiencia" min="0" placeholder="0">
+                    <div class="form-text">Si es 0, no te preocupes: el gato te entrenará a ti. 😼</div>
+                </div>
+                <h5 class="mb-3 mt-4">2. Elige a tu compañero</h5>
+                <div class="mb-3">
+                    <label for="gatito" class="form-label">Gatito disponible</label>
+                    <select class="form-select" id="gatito" required>
+                        <option value="">— Selecciona un michi —</option>
+                        <option>🐱 Pelusa — experta en tirar cosas de la mesa</option>
+                        <option>😼 Don Bigotes — CEO de dormir 18 horas</option>
+                        <option>🙀 Turbina — corre a las 3 AM sin motivo</option>
+                    </select>
+                    <div class="invalid-feedback">Debes elegir un gatito. Ellos ya te eligieron a ti.</div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label d-block">¿Tipo de vivienda?</label>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="vivienda" id="casa" value="casa" checked>
+                        <label class="form-check-label" for="casa">Casa</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="vivienda" id="depto" value="depto" >
+                        <label class="form-check-label" for="depto">Departamento</label>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="terminos" required>
+                        <label class="form-check-label" for="terminos">
+                        Acepto que el gato dormirá sobre mi teclado mientras trabajo
+                        </label>
+                        <div class="invalid-feedback">Es innegociable. Debes aceptar.</div>
+                    </div>
+                    <!-- switch: checkbox con apariencia de interruptor -->
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="newsletter" checked>
+                        <label class="form-check-label" for="newsletter">Recibir fotos de gatitos semanales</label>
+                    </div>
+                     <div class="mb-4">
+                        <label for="motivo" class="form-label">¿Por qué quieres adoptar?</label>
+                        <textarea class="form-control" id="motivo" rows="3" placeholder="Cuéntanos tu historia..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-success btn-lg w-100">🐾 Enviar solicitud de adopción</button>
+                </div>
+            </form>
+        </div>
+    </body>
+</html>

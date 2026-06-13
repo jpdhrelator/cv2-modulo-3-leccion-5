@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Ejercicio 7</title>
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+            rel="stylesheet">
+
+    </head>
+    <body>
+        <div class="container">
+        <section class="mb-5">
+            <h2>A) Una alerta para cada emoción</h2>
+
+            <div class="alert alert-success">✅ <strong>success:</strong> ¡Tu pizza fue enviada! Llega en 20 minutos.</div>
+            <div class="alert alert-danger">🔥 <strong>danger:</strong> El horno se incendió. Tu pizza no llega.</div>
+            <div class="alert alert-warning">⚠️ <strong>warning:</strong> Queda poca mozzarella. Pide pronto.</div>
+            <div class="alert alert-info">💡 <strong>info:</strong> Los martes la segunda pizza es gratis.</div>
+            <div class="alert alert-primary">🔵 <strong>primary:</strong> Nueva función: rastrea tu pizza en vivo.</div>
+            <div class="alert alert-secondary">⚪ <strong>secondary:</strong> Mensaje sin drama.</div>
+        </section>
+        <section class="mb-5">
+            <h2>B) Alerta descartable (con botón ✖)</h2>
+            <p>Agregando <code>alert-dismissible</code> + un botón con <code>data-bs-dismiss="alert"</code>:</p>
+
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <strong>⚠️ ¡Atención!</strong> Esta alerta se puede cerrar... y una vez cerrada,
+                solo vuelve si recargas la página (se elimina del DOM).
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+            </div>
+        </section>
+        <section class="mb-5">
+            <h2>C) Alertas con contenido extra</h2>
+            <div class="alert alert-success">
+                <h4 class="alert-heading">🎉 ¡Nivel completado!</h4>
+                <p>Las alertas pueden llevar títulos (<code>.alert-heading</code>), párrafos y enlaces.</p>
+                <hr>
+                <p class="mb-0">Los enlaces usan <a href="#" class="alert-link">.alert-link</a> para combinar con el color.</p>
+            </div>
+        </section>
+        </div>
+
+        <hr>
+
+    <div class="container">
+        <h1 class="mb-4 mt-5">🍞 Breadcrumb: las migas de Hansel y Gretel</h1>
+        <section class="mb-5">
+            <h2>A) ¿Dónde estoy? El GPS del sitio web</h2>
+            <p>Es una lista ordenada (<code>&lt;ol&gt;</code>) con la clase <code>.breadcrumb</code>.
+            La página actual lleva <code>.active</code> y <strong>no</strong> es un enlace:</p>
+
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="#">🏠 Inicio</a></li>
+                    <li class="breadcrumb-item"><a href="#">Tecnología</a></li>
+                    <li class="breadcrumb-item"><a href="#">Notebooks</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Notebook Gamer X9000</li>
+                </ol>
+            </nav>
+
+            <p class="text-muted">💡 Pregunta para la clase: ¿en qué tiendas online han visto esto?
+            (Respuesta: prácticamente todas — Mercado Libre, Amazon, Falabella...)</p>
+        </section>
+    </div>
+    </body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</html>
