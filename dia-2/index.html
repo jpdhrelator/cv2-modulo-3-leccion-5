@@ -228,7 +228,7 @@
 
       <div class="task-block">
         <div class="block-label">📂 Archivo a abrir</div>
-        <div class="file-pill">📄 ejercicio-01/scss/estilos.scss</div>
+        <div class="file-pill">📄 ejercicio-01/estilos.scss</div>
         <div class="task-desc">
           Cambia el valor de <code style="color:var(--accent)">$primary</code> a un color de tu elección.
           Luego abre <code style="color:var(--accent)">ejercicio-01/index.html</code> en el navegador y verifica que los botones cambien.
@@ -245,7 +245,7 @@
           <div class="hint-code" id="hint1"><span class="c-cm">// Con @use, las variables van en el bloque "with ()"</span>
 <span class="c-cm">// No se definen antes del @use como con @import</span>
 
-<span class="c-kw">@use</span> <span class="c-str">"scss/bootstrap"</span> <span class="c-kw">as</span> * <span class="c-kw">with</span> (
+<span class="c-kw">@use</span> <span class="c-str">"../scss/bootstrap"</span> <span class="c-kw">as</span> * <span class="c-kw">with</span> (
   <span class="c-var">$primary</span>: <span class="c-hi">#e63946</span>,  <span class="c-cm">// ← cambia este valor</span>
 );
 
@@ -296,7 +296,7 @@
 
       <div class="task-block">
         <div class="block-label">📂 Archivo a abrir</div>
-        <div class="file-pill">📄 ejercicio-02/scss/estilos.scss</div>
+        <div class="file-pill">📄 ejercicio-02/estilos.scss</div>
         <div class="task-desc">
           Bootstrap tiene 8 colores semánticos. Cambia todos al mismo tiempo en el <code>with ()</code>
           para crear una paleta coherente de marca.
@@ -310,7 +310,7 @@
             <span class="hint-label">scss</span>
             <button class="copy-btn" onclick="copiarHint('hint2')">Copiar</button>
           </div>
-          <div class="hint-code" id="hint2"><span class="c-kw">@use</span> <span class="c-str">"scss/bootstrap"</span> <span class="c-kw">as</span> * <span class="c-kw">with</span> (
+          <div class="hint-code" id="hint2"><span class="c-kw">@use</span> <span class="c-str">"../scss/bootstrap"</span> <span class="c-kw">as</span> * <span class="c-kw">with</span> (
   <span class="c-var">$primary</span>:   <span class="c-hi">#6c63ff</span>,   <span class="c-cm">// color principal</span>
   <span class="c-var">$secondary</span>: <span class="c-hi">#2d2d2d</span>,   <span class="c-cm">// color secundario</span>
   <span class="c-var">$success</span>:   <span class="c-hi">#06d6a0</span>,   <span class="c-cm">// éxito / confirmación</span>
@@ -368,7 +368,7 @@
 
       <div class="task-block">
         <div class="block-label">📂 Archivo a abrir</div>
-        <div class="file-pill">📄 ejercicio-03/scss/estilos.scss</div>
+        <div class="file-pill">📄 ejercicio-03/estilos.scss</div>
         <div class="task-desc">
           Bootstrap genera sus clases (<code>.btn-X</code>, <code>.bg-X</code>, <code>.text-X</code>…) a partir del mapa <code>$theme-colors</code>.
           Al configurar ese mapa en el <code>with ()</code> puedes agregar tus propios colores y Bootstrap generará todas las variantes automáticamente.
@@ -379,13 +379,10 @@
         <div class="block-label">💡 Cómo hacerlo — configurar $theme-colors</div>
         <div class="hint-block">
           <div class="hint-header">
-            <span class="hint-label">scss — carga por partes</span>
+            <span class="hint-label">scss</span>
             <button class="copy-btn" onclick="copiarHint('hint3')">Copiar</button>
           </div>
-          <div class="hint-code" id="hint3"><span class="c-kw">@use</span> <span class="c-str">"scss/functions"</span> <span class="c-kw">as</span> *;
-
-<span class="c-cm">// Cargamos variables y configuramos $theme-colors completo</span>
-<span class="c-kw">@use</span> <span class="c-str">"scss/variables"</span> <span class="c-kw">as</span> * <span class="c-kw">with</span> (
+          <div class="hint-code" id="hint3"><span class="c-kw">@use</span> <span class="c-str">"../scss/bootstrap"</span> <span class="c-kw">as</span> * <span class="c-kw">with</span> (
   <span class="c-var">$theme-colors</span>: (
     <span class="c-cm">// ── Los 8 de Bootstrap (mantenlos) ──</span>
     <span class="c-str">"primary"</span>:   <span class="c-hi">#6c63ff</span>,
@@ -399,10 +396,7 @@
     <span class="c-cm">// ── Tu color custom ─────────────────</span>
     <span class="c-str">"marca"</span>:     <span class="c-hi">#ff6584</span>,  <span class="c-cm">// ← Bootstrap genera .btn-marca, .bg-marca...</span>
   ),
-);
-<span class="c-kw">@use</span> <span class="c-str">"scss/variables-dark"</span> <span class="c-kw">as</span> *;
-<span class="c-kw">@use</span> <span class="c-str">"scss/maps"</span> <span class="c-kw">as</span> *;
-<span class="c-cm">// ... resto de Bootstrap ...</span></div>
+);</div>
         </div>
       </div>
 
@@ -446,7 +440,7 @@
       <div class="task-block">
         <div class="block-label">📂 Archivos a abrir</div>
         <div class="file-pill">📄 ejercicio-04/index.html</div>
-        <div class="file-pill">📄 ejercicio-04/scss/estilos.scss</div>
+        <div class="file-pill">📄 ejercicio-04/estilos.scss</div>
         <div class="task-desc">
           Primero elige una fuente en <a href="https://fonts.google.com" target="_blank" style="color:var(--primary)">fonts.google.com</a>,
           agrega el <code>&lt;link&gt;</code> en el HTML, luego configura las variables de tipografía en el SCSS.
@@ -470,7 +464,7 @@
             <span class="hint-label">scss</span>
             <button class="copy-btn" onclick="copiarHint('hint4')">Copiar</button>
           </div>
-          <div class="hint-code" id="hint4"><span class="c-kw">@use</span> <span class="c-str">"scss/bootstrap"</span> <span class="c-kw">as</span> * <span class="c-kw">with</span> (
+          <div class="hint-code" id="hint4"><span class="c-kw">@use</span> <span class="c-str">"../scss/bootstrap"</span> <span class="c-kw">as</span> * <span class="c-kw">with</span> (
   <span class="c-cm">// Fuente para el body (texto normal)</span>
   <span class="c-var">$font-family-sans-serif</span>: <span class="c-fn">unquote</span>(<span class="c-str">'"Inter", system-ui, sans-serif'</span>),
 
@@ -531,7 +525,7 @@
 
       <div class="task-block">
         <div class="block-label">📂 Archivo a abrir</div>
-        <div class="file-pill">📄 ejercicio-05/scss/estilos.scss</div>
+        <div class="file-pill">📄 ejercicio-05/estilos.scss</div>
         <div class="task-desc">
           Ajusta los bordes redondeados, las sombras de las tarjetas y agrega nuevos niveles al sistema de espaciado.
           Cuando termines, clases como <code>.p-6</code> y <code>.m-7</code> existirán en el CSS.
@@ -545,8 +539,7 @@
             <span class="hint-label">scss</span>
             <button class="copy-btn" onclick="copiarHint('hint5')">Copiar</button>
           </div>
-          <div class="hint-code" id="hint5"><span class="c-kw">@use</span> <span class="c-str">"scss/functions"</span> <span class="c-kw">as</span> *;
-<span class="c-kw">@use</span> <span class="c-str">"scss/variables"</span> <span class="c-kw">as</span> * <span class="c-kw">with</span> (
+          <div class="hint-code" id="hint5"><span class="c-kw">@use</span> <span class="c-str">"../scss/bootstrap"</span> <span class="c-kw">as</span> * <span class="c-kw">with</span> (
 
   <span class="c-cm">// Bordes redondeados</span>
   <span class="c-var">$border-radius</span>:    <span class="c-hi">0.5rem</span>,    <span class="c-cm">// 8px  (default: 0.375rem)</span>
@@ -652,18 +645,23 @@
       <div style="margin-bottom:1.25rem">
         <div class="block-label" style="margin-bottom:.5rem">📂 Setup — crea esta estructura</div>
         <div class="hint-block">
-          <div class="hint-code" style="font-size:.75rem">pixel-studio/
-├── index.html          ← copia el HTML de abajo
-├── scss/               ← carpeta Bootstrap (del ZIP)
+          <div class="hint-code" style="font-size:.75rem">ejercicios-sass/
+├── scss/                    ← fuentes Bootstrap (del ZIP, compartida)
 │   ├── bootstrap.scss
 │   ├── functions.scss
-│   └── ...             (todos los archivos del ZIP)
-├── estilos.scss        ← creas este desde cero
-└── css/
-    └── estilos.css     ← Live Sass lo genera solo</div>
+│   └── ...
+├── ejercicio-01/
+│   ├── index.html
+│   └── estilos.scss         ← @use "../scss/bootstrap"
+├── ejercicio-02/ ... 05/
+└── pixel-studio/
+    ├── index.html           ← copia el HTML de abajo
+    ├── estilos.scss         ← creas este desde cero
+    └── css/
+        └── estilos.css      ← Live Sass lo genera solo</div>
         </div>
         <div class="info-box">
-          <strong>Descarga Bootstrap SASS:</strong> ve a <a href="https://getbootstrap.com/docs/5.3/getting-started/download/" target="_blank" style="color:var(--primary)">getbootstrap.com → Download</a>, descarga el <strong>Source files</strong> (ZIP), extrae la carpeta <code>scss/</code> y pégala dentro de <code>pixel-studio/</code>.
+          <strong>Descarga Bootstrap SASS:</strong> ve a <a href="https://getbootstrap.com/docs/5.3/getting-started/download/" target="_blank" style="color:var(--primary)">getbootstrap.com → Download</a>, descarga <strong>Source files</strong> (ZIP), extrae la carpeta <code>scss/</code> y pégala en la raíz del proyecto (misma carpeta que <code>ejercicio-01/</code>, <code>pixel-studio/</code>, etc.). Así todos los ejercicios la comparten.
         </div>
       </div>
 
@@ -820,9 +818,9 @@
             <div class="hint-code" id="scss-start" style="max-height:380px;overflow-y:auto;font-size:.72rem"><span class="c-cm">// pixel-studio/scss/estilos.scss</span>
 <span class="c-cm">// Construye esto desde cero usando lo que practicaste en los 5 minis</span>
 
-<span class="c-kw">@use</span> <span class="c-str">"scss/functions"</span> <span class="c-kw">as</span> *;
+<span class="c-kw">@use</span> <span class="c-str">"../scss/functions"</span> <span class="c-kw">as</span> *;
 
-<span class="c-kw">@use</span> <span class="c-str">"scss/variables"</span> <span class="c-kw">as</span> * <span class="c-kw">with</span> (
+<span class="c-kw">@use</span> <span class="c-str">"../scss/variables"</span> <span class="c-kw">as</span> * <span class="c-kw">with</span> (
 
   <span class="c-cm">// ── TÉCNICA 1: Colores del sistema ────────────────</span>
   <span class="c-var">$primary</span>:   <span class="c-hi">???</span>,   <span class="c-cm">// violeta del brief</span>
@@ -868,23 +866,23 @@
   <span class="c-var">$box-shadow-lg</span>:    <span class="c-hi">???</span>,
 );
 
-<span class="c-kw">@use</span> <span class="c-str">"scss/variables-dark"</span> <span class="c-kw">as</span> *;
-<span class="c-kw">@use</span> <span class="c-str">"scss/maps"</span> <span class="c-kw">as</span> *;
-<span class="c-kw">@use</span> <span class="c-str">"scss/mixins"</span> <span class="c-kw">as</span> *;
-<span class="c-kw">@use</span> <span class="c-str">"scss/root"</span> <span class="c-kw">as</span> *;
-<span class="c-kw">@use</span> <span class="c-str">"scss/reboot"</span> <span class="c-kw">as</span> *;
-<span class="c-kw">@use</span> <span class="c-str">"scss/type"</span> <span class="c-kw">as</span> *;
-<span class="c-kw">@use</span> <span class="c-str">"scss/images"</span> <span class="c-kw">as</span> *;
-<span class="c-kw">@use</span> <span class="c-str">"scss/containers"</span> <span class="c-kw">as</span> *;
-<span class="c-kw">@use</span> <span class="c-str">"scss/grid"</span> <span class="c-kw">as</span> *;
-<span class="c-kw">@use</span> <span class="c-str">"scss/helpers"</span> <span class="c-kw">as</span> *;
-<span class="c-kw">@use</span> <span class="c-str">"scss/utilities"</span> <span class="c-kw">as</span> *;
-<span class="c-kw">@use</span> <span class="c-str">"scss/utilities/api"</span> <span class="c-kw">as</span> *;
-<span class="c-kw">@use</span> <span class="c-str">"scss/components/buttons"</span> <span class="c-kw">as</span> *;
-<span class="c-kw">@use</span> <span class="c-str">"scss/components/card"</span> <span class="c-kw">as</span> *;
-<span class="c-kw">@use</span> <span class="c-str">"scss/components/nav"</span> <span class="c-kw">as</span> *;
-<span class="c-kw">@use</span> <span class="c-str">"scss/components/navbar"</span> <span class="c-kw">as</span> *;
-<span class="c-kw">@use</span> <span class="c-str">"scss/components/badge"</span> <span class="c-kw">as</span> *;
+<span class="c-kw">@use</span> <span class="c-str">"../scss/variables-dark"</span> <span class="c-kw">as</span> *;
+<span class="c-kw">@use</span> <span class="c-str">"../scss/maps"</span> <span class="c-kw">as</span> *;
+<span class="c-kw">@use</span> <span class="c-str">"../scss/mixins"</span> <span class="c-kw">as</span> *;
+<span class="c-kw">@use</span> <span class="c-str">"../scss/root"</span> <span class="c-kw">as</span> *;
+<span class="c-kw">@use</span> <span class="c-str">"../scss/reboot"</span> <span class="c-kw">as</span> *;
+<span class="c-kw">@use</span> <span class="c-str">"../scss/type"</span> <span class="c-kw">as</span> *;
+<span class="c-kw">@use</span> <span class="c-str">"../scss/images"</span> <span class="c-kw">as</span> *;
+<span class="c-kw">@use</span> <span class="c-str">"../scss/containers"</span> <span class="c-kw">as</span> *;
+<span class="c-kw">@use</span> <span class="c-str">"../scss/grid"</span> <span class="c-kw">as</span> *;
+<span class="c-kw">@use</span> <span class="c-str">"../scss/helpers"</span> <span class="c-kw">as</span> *;
+<span class="c-kw">@use</span> <span class="c-str">"../scss/utilities"</span> <span class="c-kw">as</span> *;
+<span class="c-kw">@use</span> <span class="c-str">"../scss/utilities/api"</span> <span class="c-kw">as</span> *;
+<span class="c-kw">@use</span> <span class="c-str">"../scss/components/buttons"</span> <span class="c-kw">as</span> *;
+<span class="c-kw">@use</span> <span class="c-str">"../scss/components/card"</span> <span class="c-kw">as</span> *;
+<span class="c-kw">@use</span> <span class="c-str">"../scss/components/nav"</span> <span class="c-kw">as</span> *;
+<span class="c-kw">@use</span> <span class="c-str">"../scss/components/navbar"</span> <span class="c-kw">as</span> *;
+<span class="c-kw">@use</span> <span class="c-str">"../scss/components/badge"</span> <span class="c-kw">as</span> *;
 
 <span class="c-cm">// Tus estilos adicionales aquí:</span></div>
           </div>
