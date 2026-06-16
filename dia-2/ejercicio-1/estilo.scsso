@@ -1,0 +1,5 @@
+@use "../scss/bootstrap.scss" as * with (
+    $primary: rgb(186, 237, 0),
+    $secondary:rgb(237, 162, 0)
+)
+

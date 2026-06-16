@@ -1,0 +1,23 @@
+
+
+@use "../scss/bootstrap" as * with (
+  $font-family-sans-serif: unquote('"Playfair Display", Georgia, serif'),
+  $font-family-monospace:  unquote('"Playfair Display", Georgia, serif'),
+
+   $h1-font-size: 4rem, 
+   $h2-font-size:   2.25rem,
+   $h3-font-size:   1.75rem,
+   $h4-font-size:   1.375rem,
+   $h5-font-size:   1.125rem,
+   $h6-font-size:   1rem,
+   
+   $headings-font-family: unquote('"Playfair Display", Georgia, serif'),
+   $headings-font-weight: 700,
+   $headings-line-height: 1.15,
+   $headings-color:       #6612dc,
+
+    $line-height-base: 1.7,
+    $font-weight-base: 700,
+);
+
+

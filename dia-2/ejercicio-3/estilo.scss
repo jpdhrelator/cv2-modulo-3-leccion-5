@@ -1,0 +1,66 @@
+
+
+@use "../scss/bootstrap" with (
+  $theme-colors: (
+    "primary":   #0d6efd,
+    "secondary": #6c757d,
+    "success":   #198754,
+    "info":      #0dcaf0,
+    "warning":   #ffc107,
+    "danger":    #dc3545,
+    "light":     #f8f9fa,
+    "dark":      #212529,
+    
+    "marca":     #6c63ff,
+    "acento":    #ff6584,
+    "carbon":    #1a1a2e,
+    "menta":     #06d6a0,
+   ),
+   $theme-colors-text: (
+    "primary":   #0d6efd,
+    "secondary": #6c757d,
+    "success":   #198754,
+    "info":      #0dcaf0,
+    "warning":   #ffc107,
+    "danger":    #dc3545,
+    "light":     #f8f9fa,
+    "dark":      #212529,
+    
+    "marca":     #6c63ff,
+    "acento":    #ff6584,
+    "carbon":    #1a1a2e,
+    "menta":     #000,
+   ),
+   $theme-colors-bg-subtle: (
+    "primary":   #0d6efd,
+    "secondary": #6c757d,
+    "success":   #198754,
+    "info":      #0dcaf0,
+    "warning":   #ffc107,
+    "danger":    #dc3545,
+    "light":     #f8f9fa,
+    "dark":      #212529,
+    
+    "marca":     #6c63ff,
+    "acento":    #ff6584,
+    "carbon":    #1a1a2e,
+    "menta":     #05f3b3,
+   ),
+   $theme-colors-border-subtle: (
+    "primary":   #0d6efd,
+    "secondary": #6c757d,
+    "success":   #198754,
+    "info":      #0dcaf0,
+    "warning":   #ffc107,
+    "danger":    #dc3545,
+    "light":     #f8f9fa,
+    "dark":      #212529,
+    
+    "marca":     #6c63ff,
+    "acento":    #ff6584,
+    "carbon":    #1a1a2e,
+    "menta":     #05b889,
+   ),
+);
+
+

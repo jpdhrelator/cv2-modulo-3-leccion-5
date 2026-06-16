@@ -1,0 +1,12 @@
+@use "../scss/bootstrap.scss" as * with (
+  $primary:   #6c63ff,   // Violeta (antes: azul #0d6efd)
+  $secondary: #2d2d2d,   // Casi negro (antes: gris #6c757d)
+  $success:   #06d6a0,   // Verde menta (antes: verde #198754)
+  $info:      #48cae4,   // Cyan claro
+  $warning:   #ffd166,   // Amarillo suave
+  $danger:    #ef476f,   // Rosa fuerte
+  $light:     #f8f9fa,
+  $dark:      #1a1a2e, 
+
+)
+
